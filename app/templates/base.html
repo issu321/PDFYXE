@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="csrf-token" content="{{ csrf_token() }}">
+  <title>{% block title %}PDFCraft{% endblock %} · Enterprise PDF Studio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
+  {% block head %}{% endblock %}
+</head>
+<body class="{% if current_user.is_authenticated %}app-body{% else %}auth-body{% endif %}">
+  <!-- Subtle ambient background luminous mesh -->
+  <div class="ambient-glow-layer" aria-hidden="true">
+    <div class="ambient-orb orb-1"></div>
+    <div class="ambient-orb orb-2"></div>
+    <div class="ambient-orb orb-3"></div>
+  </div>
+
+{% if current_user.is_authenticated %}
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <a class="brand" href="{{ url_for('dashboard.index') }}" aria-label="PDFCraft home">
+          <span class="brand-mark">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M7 3.75h7l4.25 4.3v12.2H7a2 2 0 0 1-2-2v-12.5a2 2 0 0 1 2-2Z"/>
+              <path d="M14 4v4.5h4.2M8.5 13h7M8.5 16.5h7"/>
+            </svg>
+          </span>
+          <span class="brand-text">PDFCraft <span class="brand-badge">PRO</span></span>
+        </a>
+      </div>
+
+      <div class="side-nav-scroll">
+        <div class="side-label">WORKSPACE</div>
+        <nav class="side-nav" aria-label="Main navigation">
+          <a class="nav-item {% if request.endpoint == 'dashboard.index' %}active{% endif %}" href="{{ url_for('dashboard.index') }}">
+            <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1v-9.5Z"/></svg></span>
+            <span>Dashboard</span>
+          </a>
+          <a class="nav-item {% if request.endpoint == 'pdf.workspace' %}active{% endif %}" href="{{ url_for('dashboard.index') }}#upload">
+            <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6Zm-1 2 5 5h-5V4ZM8 13h8v2H8v-2Zm0 4h5v2H8v-2Z"/></svg></span>
+            <span>Extract pages</span>
+          </a>
+          <a class="nav-item {% if request.endpoint == 'pdf.merge_workspace' %}active{% endif %}" href="{{ url_for('pdf.merge_workspace') }}">
+            <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M12 4v16m-8-8h16"/></svg></span>
+            <span>Merge PDFs</span>
+          </a>
+          <a class="nav-item {% if request.endpoint == 'documents.index' %}active{% endif %}" href="{{ url_for('documents.index') }}">
+            <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M4 4h16v16H4V4Zm2 2v12h12V6H6Zm2 2h8v2H8V8Zm0 4h8v2H8v-2Z"/></svg></span>
+            <span>My documents</span>
+          </a>
+          <a class="nav-item {% if request.endpoint == 'documents.generated' %}active{% endif %}" href="{{ url_for('documents.generated') }}">
+            <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M12 3v12m0 0 4-4m-4 4-4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg></span>
+            <span>Generated PDFs</span>
+          </a>
+          <a class="nav-item {% if request.endpoint == 'documents.history' %}active{% endif %}" href="{{ url_for('documents.history') }}">
+            <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M12 6v6l4 2m6-2a10 10 0 1 1-10-10 10 10 0 0 1 10 10Z"/></svg></span>
+            <span>Processing history</span>
+          </a>
+        </nav>
+
+        <div class="side-label side-label-lower">ACCOUNT</div>
+        <nav class="side-nav" aria-label="Account navigation">
+          <a class="nav-item {% if request.endpoint == 'auth.profile' %}active{% endif %}" href="{{ url_for('auth.profile') }}">
+            <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10Zm0 2c-5.33 0-8 2.67-8 6v1h16v-1c0-3.33-2.67-6-8-6Z"/></svg></span>
+            <span>Profile & security</span>
+          </a>
+        </nav>
+      </div>
+
+      <div class="sidebar-bottom">
+        <div class="storage-card">
+          <div class="storage-card-header">
+            <span class="storage-dot"></span>
+            <strong>Enterprise Security</strong>
+          </div>
+          <p>Isolated storage · Zero telemetry · In-memory page processing</p>
+        </div>
+        <div class="user-chip">
+          <div class="avatar">{{ current_user.username[:1]|upper }}</div>
+          <div class="user-details">
+            <strong title="{{ current_user.username }}">{{ current_user.username }}</strong>
+            <small>Private workspace</small>
+          </div>
+          <form action="{{ url_for('auth.logout') }}" method="post" class="logout-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button class="icon-button" aria-label="Sign out" title="Sign out">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 17l5-5-5-5M15 12H4m9-7h5a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-5"/></svg>
+            </button>
+          </form>
+        </div>
+      </div>
+    </aside>
+
+    <div class="sidebar-backdrop" id="sidebarBackdrop" aria-hidden="true"></div>
+
+    <main class="main-area">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="mobile-menu icon-button" id="menuToggle" aria-label="Toggle navigation">
+            <svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          </button>
+          <nav class="breadcrumb-nav" aria-label="Breadcrumb">
+            <span class="crumb-root">PDFCraft</span>
+            <span class="crumb-separator">/</span>
+            <span class="crumb-current">{% block breadcrumb %}Overview{% endblock %}</span>
+          </nav>
+        </div>
+        <div class="topbar-right">
+          <div class="status-indicator">
+            <span class="pulse-dot"></span>
+            <span>Private & Encrypted</span>
+          </div>
+          <a class="top-avatar" href="{{ url_for('auth.profile') }}" title="Manage Profile">
+            {{ current_user.username[:1]|upper }}
+          </a>
+        </div>
+      </header>
+
+      <div class="page-content">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <div class="flash-stack" id="flashStack">
+              {% for category, message in messages %}
+                <div class="flash flash-{{ category }}" role="status">
+                  <span class="flash-icon">
+                    {% if category == 'success' %}✓
+                    {% elif category == 'error' or category == 'danger' %}✕
+                    {% else %}ℹ{% endif %}
+                  </span>
+                  <div class="flash-message">{{ message }}</div>
+                  <button type="button" class="flash-close" aria-label="Dismiss">&times;</button>
+                </div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+      </div>
+    </main>
+  </div>
+{% else %}
+  <main class="auth-shell">
+    <div class="auth-topbar">
+      <a class="auth-brand" href="{{ url_for('auth.login') }}">
+        <span class="brand-mark">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M7 3.75h7l4.25 4.3v12.2H7a2 2 0 0 1-2-2v-12.5a2 2 0 0 1 2-2Z"/>
+            <path d="M14 4v4.5h4.2M8.5 13h7M8.5 16.5h7"/>
+          </svg>
+        </span>
+        <span class="brand-text">PDFCraft <span class="brand-badge">STUDIO</span></span>
+      </a>
+      <div class="auth-header-link">
+        {% if request.endpoint == 'auth.register' %}
+          <span>Already have an account?</span>
+          <a href="{{ url_for('auth.login') }}" class="button button-ghost button-sm">Sign in</a>
+        {% else %}
+          <span>New to PDFCraft?</span>
+          <a href="{{ url_for('auth.register') }}" class="button button-ghost button-sm">Create account</a>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="auth-container">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <div class="flash-stack" id="flashStack">
+            {% for category, message in messages %}
+              <div class="flash flash-{{ category }}" role="status">
+                <span class="flash-icon">
+                  {% if category == 'success' %}✓
+                  {% elif category == 'error' or category == 'danger' %}✕
+                  {% else %}ℹ{% endif %}
+                </span>
+                <div class="flash-message">{{ message }}</div>
+                <button type="button" class="flash-close" aria-label="Dismiss">&times;</button>
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+
+      {% block auth_content %}{% endblock %}
+    </div>
+
+    <footer class="auth-footer">
+      <div class="auth-footer-badge">Enterprise PDF Manipulation Engine</div>
+      <div class="auth-footer-links">
+        <span>Pure Glassmorphism Design System</span>
+        <span class="dot-sep">·</span>
+        <span>Secure Local Processing</span>
+        <span class="dot-sep">·</span>
+        <span>High-Fidelity Rendering</span>
+      </div>
+    </footer>
+  </main>
+{% endif %}
+
+  <script src="{{ url_for('static', filename='js/app.js') }}" defer></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

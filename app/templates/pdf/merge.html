@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+{% block title %}Merge PDFs{% endblock %}
+{% block breadcrumb %}Merge Studio{% endblock %}
+
+{% block content %}
+<section class="workspace-header">
+  <div class="workspace-header-main">
+    <a class="back-link" href="{{ url_for('dashboard.index') }}">
+      <svg viewBox="0 0 24 24" width="16" height="16"><path d="M19 12H5m7-7-7 7 7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <span>Dashboard</span>
+    </a>
+    <div class="workspace-title-row">
+      <span class="eyebrow">DOCUMENT STUDIO</span>
+      <h1>Merge PDF Documents</h1>
+      <p>Select two or more PDFs from your private library and arrange their sequence into one unified document.</p>
+    </div>
+  </div>
+
+  <div class="merge-summary-card">
+    <div class="merge-summary-icon">
+      <svg viewBox="0 0 24 24"><path d="M12 4v16m-8-8h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    </div>
+    <div class="merge-summary-text">
+      <strong>Unified Vector Output</strong>
+      <small>All vector text, fonts, and images retained</small>
+    </div>
+  </div>
+</section>
+
+{% if documents|length < 2 %}
+<section class="empty-state merge-empty">
+  <img src="{{ url_for('static', filename='img/illustrations/empty-merge.svg') }}" alt="" class="empty-vector" width="180" height="140" />
+  <h3>Add at least two PDFs to merge</h3>
+  <p>Merging combines multiple documents together into a single organized file. You currently have {{ documents|length }} document in your library.</p>
+  <a class="button button-primary button-lg" href="{{ url_for('dashboard.index') }}#upload">
+    <svg viewBox="0 0 24 24" width="18" height="18"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6Z" fill="currentColor"/></svg>
+    <span>Upload Source PDF</span>
+  </a>
+</section>
+{% else %}
+<section class="merge-toolbar">
+  <div class="selection-summary">
+    <span class="selected-count" id="mergeCount">0</span>
+    <span class="summary-text">documents selected</span>
+    <span class="remaining-count" id="mergePageCount">0 pages combined</span>
+  </div>
+  <div class="selection-actions">
+    <button type="button" class="tool-button" id="mergeSelectAll">Select all ({{ documents|length }})</button>
+    <button type="button" class="tool-button" id="mergeClear">Clear</button>
+  </div>
+</section>
+
+<section class="merge-order-panel" id="mergeOrderPanel" hidden>
+  <div class="order-heading">
+    <div>
+      <strong>Output Sequence</strong>
+      <small>Drag documents to adjust the merge sequence. The first document will appear first.</small>
+    </div>
+    <span class="drag-hint">
+      <svg viewBox="0 0 24 24" width="14" height="14"><path d="M8 9h8m-8 6h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <span>Drag items to reorder</span>
+    </span>
+  </div>
+  <div class="merge-order-list" id="mergeOrderList"></div>
+</section>
+
+<div class="operation-feedback feedback-error hidden" id="mergeFeedback" role="alert" aria-live="assertive"></div>
+
+<section class="merge-library">
+  <div class="section-heading">
+    <div>
+      <h2>Source PDF Library</h2>
+      <p>Select the documents you wish to include in this merged bundle.</p>
+    </div>
+    <span class="library-badge">{{ documents|length }} available</span>
+  </div>
+
+  <div class="merge-document-grid" id="mergeDocumentGrid">
+    {% for document in documents %}
+    <label class="merge-document-card" data-document-id="{{ document.id }}" data-pages="{{ document.total_pages }}" data-name="{{ document.original_filename }}">
+      <input type="checkbox" class="merge-checkbox" aria-label="Select {{ document.original_filename }}">
+      <div class="merge-doc-icon">
+        <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6Z" fill="currentColor"/></svg>
+      </div>
+      <div class="merge-doc-meta">
+        <strong title="{{ document.original_filename }}">{{ document.original_filename }}</strong>
+        <small>{{ document.total_pages }} {% if document.total_pages == 1 %}page{% else %}pages{% endif %} <i>·</i> {{ document.file_size|filesizeformat }}</small>
+      </div>
+      <div class="card-selection-check">
+        <svg viewBox="0 0 24 24" width="14" height="14"><path d="M5 13l4 4L19 7" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+      </div>
+    </label>
+    {% endfor %}
+  </div>
+</section>
+
+<!-- Sticky Frosted Footer for Merge -->
+<footer class="editor-footer merge-footer">
+  <div class="footer-info">
+    <strong id="mergeFooterTitle">Select at least two PDFs</strong>
+    <small id="mergeFooterNote">Each document's internal page sequence is fully preserved.</small>
+  </div>
+  <div class="footer-actions">
+    <button id="mergeButton" class="button button-primary button-lg" type="button" disabled>
+      <span>Merge selected PDFs</span>
+      <svg viewBox="0 0 24 24" width="18" height="18"><path d="M5 12h14m-7-7 7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+</footer>
+
+<!-- Result Download Modal -->
+<div class="modal-backdrop hidden" id="mergeResultModal" role="dialog" aria-modal="true" aria-labelledby="mergeResultTitle">
+  <section class="result-card">
+    <button class="modal-close icon-button" id="closeMergeResult" aria-label="Close dialog">&times;</button>
+    <div class="success-mark-ring">
+      <svg viewBox="0 0 24 24" width="32" height="32"><path d="M5 13l4 4L19 7" stroke="#0EA5E9" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+    </div>
+    <span class="eyebrow">MERGE COMPLETE</span>
+    <h2 id="mergeResultTitle">Your merged PDF is ready</h2>
+    <p class="result-subtitle" id="mergeResultDetails"></p>
+    <div class="result-meta" id="mergeResultMeta"></div>
+    <div class="result-actions">
+      <a class="button button-primary button-wide button-lg" id="mergeDownload" href="#">
+        <svg viewBox="0 0 24 24" width="18" height="18"><path d="M12 3v12m0 0 4-4m-4 4-4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg>
+        <span>Download Merged PDF</span>
+      </a>
+      <button class="button button-secondary button-wide" id="mergeAgain" type="button">Merge Another Set</button>
+    </div>
+  </section>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+{% if documents|length >= 2 %}
+<script src="{{ url_for('static', filename='js/merge.js') }}" defer></script>
+{% endif %}
+{% endblock %}

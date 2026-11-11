@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% block title %}Generated PDFs{% endblock %}
+{% block breadcrumb %}Generated PDFs{% endblock %}
+
+{% block content %}
+<section class="welcome-hero">
+  <div class="welcome-text">
+    <span class="eyebrow">EXPORT GALLERY</span>
+    <h1 class="welcome-title">Generated PDFs</h1>
+    <p class="welcome-desc">Every custom page extraction and merged document created in your workspace, securely compiled and ready for immediate download.</p>
+  </div>
+  <div class="welcome-actions">
+    <a class="button button-secondary button-lg" href="{{ url_for('pdf.merge_workspace') }}">
+      <svg viewBox="0 0 24 24" width="18" height="18"><path d="M12 4v16m-8-8h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <span>Merge PDFs</span>
+    </a>
+  </div>
+</section>
+
+<!-- Filter Toolbar -->
+<div class="table-toolbar">
+  <div class="search-input-wrapper">
+    <svg class="search-icon" viewBox="0 0 24 24" width="18" height="18"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2" fill="none"/><path d="m20 20-3-3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    <input type="search" id="generatedTableSearch" class="table-search-input" placeholder="Search generated PDFs by source or date…" aria-label="Search generated documents">
+  </div>
+  <div class="table-stats-badge">
+    <span id="filteredGenCount">{{ generated_pdfs|length }}</span> files generated
+  </div>
+</div>
+
+<section class="list-panel">
+{% if generated_pdfs %}
+  <div class="table-head generated-head">
+    <span>SOURCE WORKSPACE</span>
+    <span>OUTPUT SPECIFICATION</span>
+    <span>CREATED DATE</span>
+    <span>FILE SIZE</span>
+    <span class="align-right">ACTIONS</span>
+  </div>
+  <div class="table-body" id="generatedTableBody">
+    {% for item in generated_pdfs %}
+      <div class="table-row generated-row" data-search-term="{{ (item.source_document.original_filename if item.source_document else 'merged')|lower }} {{ item.created_at.strftime('%b %d %Y')|lower }}">
+        <a class="table-document" href="{{ url_for('pdf.workspace', document_id=item.source_document_id) if item.source_document_id else '#' }}">
+          <div class="file-icon-box">
+            <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6Z" fill="currentColor"/></svg>
+            <span class="icon-label">PDF</span>
+          </div>
+          <div class="table-doc-info">
+            <strong class="table-doc-title">
+              {{ 'Merged Document' if item.operation_type == 'merge' else item.source_document.original_filename }}
+            </strong>
+            <small class="table-doc-size">
+              {{ 'Combined from ' ~ (item.source_document_ids|length) ~ ' PDF files' if item.operation_type == 'merge' else 'Extracted from source' }}
+            </small>
+          </div>
+        </a>
+
+        <span class="table-cell-output">
+          <span class="pages-badge">{{ item.total_selected_pages }} pages</span>
+          <small class="page-sequence">{{ 'Merged in sequence' if item.operation_type == 'merge' else 'Custom page selection' }}</small>
+        </span>
+
+        <span class="table-cell-date">{{ item.created_at.strftime('%b %d, %Y') }}</span>
+        <span class="table-cell-size">{{ item.file_size|filesizeformat }}</span>
+
+        <span class="row-actions align-right">
+          <a class="icon-button" href="{{ url_for('documents.download_generated', generated_id=item.id) }}" title="Download Generated PDF" aria-label="Download generated PDF">
+            <svg viewBox="0 0 24 24"><path d="M12 3v12m0 0 4-4m-4 4-4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg>
+          </a>
+          <form method="post" action="{{ url_for('documents.delete_generated', generated_id=item.id) }}" onsubmit="return confirm('Delete this generated PDF?')">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button class="icon-button danger-action" aria-label="Delete generated PDF" title="Delete output">
+              <svg viewBox="0 0 24 24"><path d="M3 6h18m-2 0v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6m3 0V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+            </button>
+          </form>
+        </span>
+      </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="empty-state">
+    <img src="{{ url_for('static', filename='img/illustrations/empty-generated.svg') }}" alt="" class="empty-vector" width="180" height="140" />
+    <h3>No generated PDFs in your gallery yet</h3>
+    <p>Select pages from any document in your library to extract a custom file or merge multiple PDFs together.</p>
+    <a class="button button-primary button-lg" href="{{ url_for('documents.index') }}">
+      <svg viewBox="0 0 24 24" width="18" height="18"><path d="M4 4h16v16H4V4Z" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+      <span>Browse Source Documents</span>
+    </a>
+  </div>
+{% endif %}
+</section>
+{% endblock %}

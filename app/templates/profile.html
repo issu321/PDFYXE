@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% block title %}Profile &amp; Security{% endblock %}
+{% block breadcrumb %}Profile &amp; Security{% endblock %}
+
+{% block content %}
+<section class="welcome-hero">
+  <div class="welcome-text">
+    <span class="eyebrow">WORKSPACE SECURITY</span>
+    <h1 class="welcome-title">Profile &amp; Security</h1>
+    <p class="welcome-desc">Manage your identity credentials, password verification, and encryption parameters.</p>
+  </div>
+</section>
+
+<section class="profile-layout">
+  <!-- Profile Identity Card -->
+  <div class="profile-card identity-card">
+    <div class="profile-avatar-large">
+      {{ current_user.username[:1]|upper }}
+    </div>
+    <div class="identity-info">
+      <span class="eyebrow">ACTIVE ACCOUNT</span>
+      <h2>{{ current_user.username }}</h2>
+      <p class="profile-email">{{ current_user.email }}</p>
+    </div>
+    <div class="profile-divider"></div>
+    <div class="profile-meta-grid">
+      <div class="profile-meta-item">
+        <span class="meta-label">Member Since</span>
+        <strong>{{ current_user.created_at.strftime('%B %Y') }}</strong>
+      </div>
+      <div class="profile-meta-item">
+        <span class="meta-label">Storage Region</span>
+        <strong>Local / In-Process</strong>
+      </div>
+      <div class="profile-meta-item">
+        <span class="meta-label">Session Protection</span>
+        <strong class="text-success">CSRF &amp; Secure Cookie</strong>
+      </div>
+      <div class="profile-meta-item">
+        <span class="meta-label">Encryption Level</span>
+        <strong class="text-sky">Hardware AES-256</strong>
+      </div>
+    </div>
+  </div>
+
+  <!-- Password & Security Card -->
+  <div class="profile-card password-card">
+    <div class="profile-card-header">
+      <span class="eyebrow">CREDENTIAL MANAGEMENT</span>
+      <h2>Update Password</h2>
+      <p>Ensure your account remains safeguarded with a robust, unique password.</p>
+    </div>
+
+    <form method="post" class="form-stack">
+      {{ form.hidden_tag() }}
+
+      <div class="field">
+        <label for="{{ form.current_password.id }}" class="field-label">Current password</label>
+        <div class="input-wrapper">
+          <svg class="input-icon" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+          {{ form.current_password(class="text-input with-icon", autocomplete="current-password") }}
+        </div>
+        {% for error in form.current_password.errors %}
+          <small class="field-error">{{ error }}</small>
+        {% endfor %}
+      </div>
+
+      <div class="field">
+        <label for="{{ form.new_password.id }}" class="field-label">New password</label>
+        <div class="input-wrapper">
+          <svg class="input-icon" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+          {{ form.new_password(class="text-input with-icon", autocomplete="new-password") }}
+        </div>
+        <small class="field-hint">Must be at least 10 characters and include at least one letter and one number.</small>
+        {% for error in form.new_password.errors %}
+          <small class="field-error">{{ error }}</small>
+        {% endfor %}
+      </div>
+
+      <div class="field">
+        <label for="{{ form.confirm_password.id }}" class="field-label">Confirm new password</label>
+        <div class="input-wrapper">
+          <svg class="input-icon" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+          {{ form.confirm_password(class="text-input with-icon", autocomplete="new-password") }}
+        </div>
+        {% for error in form.confirm_password.errors %}
+          <small class="field-error">{{ error }}</small>
+        {% endfor %}
+      </div>
+
+      <div class="form-actions">
+        <button class="button button-primary button-lg" type="submit">
+          <span>Save New Password</span>
+          <svg viewBox="0 0 24 24" width="16" height="16"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+        </button>
+      </div>
+    </form>
+  </div>
+</section>
+{% endblock %}

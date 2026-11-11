@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+{% block title %}Extract &amp; Organize Pages — {{ document.original_filename }}{% endblock %}
+{% block breadcrumb %}Page Studio{% endblock %}
+{% block head %}<meta name="document-id" content="{{ document.id }}">{% endblock %}
+
+{% block content %}
+<!-- Workspace Header with Document Meta -->
+<section class="workspace-header">
+  <div class="workspace-header-main">
+    <a class="back-link" href="{{ url_for('documents.index') }}">
+      <svg viewBox="0 0 24 24" width="16" height="16"><path d="M19 12H5m7-7-7 7 7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <span>Return to Library</span>
+    </a>
+    <div class="workspace-title-row">
+      <span class="eyebrow">DOCUMENT STUDIO</span>
+      <h1>Organize &amp; Select Pages</h1>
+      <p>Click individual pages to toggle selection, reorder outputs by dragging, or remove unwanted pages.</p>
+    </div>
+  </div>
+
+  <div class="source-chip-lg">
+    <div class="chip-file-icon">
+      <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6Z" fill="currentColor"/></svg>
+      <span>PDF</span>
+    </div>
+    <div class="chip-meta">
+      <strong class="chip-title" title="{{ document.original_filename }}">{{ document.original_filename }}</strong>
+      <div class="chip-sub">
+        <span>{{ document.total_pages }} total pages</span>
+        <span class="sep">·</span>
+        <span>{{ document.file_size|filesizeformat }}</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Editor Operation Toolbar -->
+<section class="editor-toolbar">
+  <div class="selection-tools">
+    <div class="editor-mode" role="group" aria-label="PDF operation mode">
+      <button type="button" class="mode-button active" id="extractMode" aria-pressed="true">
+        <svg viewBox="0 0 24 24" width="15" height="15"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6Z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 11v6m-3-3 3 3 3-3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <span>Extract selected</span>
+      </button>
+      <button type="button" class="mode-button" id="removeMode" aria-pressed="false">
+        <svg viewBox="0 0 24 24" width="15" height="15"><path d="M3 6h18m-2 0v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6m3 0V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" fill="none" stroke="currentColor" stroke-width="2"/><line x1="10" y1="11" x2="10" y2="17" stroke="currentColor" stroke-width="2"/><line x1="14" y1="11" x2="14" y2="17" stroke="currentColor" stroke-width="2"/></svg>
+        <span>Remove selected</span>
+      </button>
+    </div>
+
+    <div class="selection-summary" aria-live="polite">
+      <span class="selected-count" id="selectedCount">0</span>
+      <span class="summary-text" id="selectionDescription">of {{ document.total_pages }} pages selected</span>
+      <span class="remaining-count" id="remainingCount">{{ document.total_pages }} remaining</span>
+    </div>
+  </div>
+
+  <div class="selection-actions">
+    <div class="button-group">
+      <button type="button" class="tool-button" id="selectAll">All</button>
+      <button type="button" class="tool-button" id="selectOdd">Odd</button>
+      <button type="button" class="tool-button" id="selectEven">Even</button>
+      <button type="button" class="tool-button" id="clearSelection">Clear</button>
+    </div>
+
+    <div class="range-control">
+      <input type="text" id="rangeInput" class="range-input" placeholder="Pages (e.g. 1-4, 8)" aria-label="Custom page range">
+      <button class="button button-primary button-sm" id="applyRange" type="button">Apply</button>
+    </div>
+  </div>
+</section>
+
+<!-- Feedback Notice -->
+<div class="operation-feedback hidden" id="operationFeedback" role="alert" aria-live="assertive"></div>
+
+<!-- Selected Output Order Panel -->
+<section class="selected-order-panel" id="selectedOrderPanel" hidden>
+  <div class="order-heading">
+    <div>
+      <strong>Export Sequence</strong>
+      <small>Drag thumbnails to change their position in the created PDF.</small>
+    </div>
+    <span class="drag-hint">
+      <svg viewBox="0 0 24 24" width="14" height="14"><path d="M8 9h8m-8 6h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <span>Drag tiles to reorder</span>
+    </span>
+  </div>
+  <div class="selected-order-list" id="selectedOrderList" aria-label="Selected pages in output order"></div>
+  <div class="order-pagination hidden" id="orderPagination">
+    <button id="orderPrev" type="button" class="pagination-button" aria-label="Previous selected pages">←</button>
+    <span id="orderRangeLabel"></span>
+    <button id="orderNext" type="button" class="pagination-button" aria-label="Next selected pages">→</button>
+  </div>
+</section>
+
+<!-- Main Page Previews Grid Section -->
+<section class="pages-section">
+  <div class="pages-section-header">
+    <div class="section-heading pages-heading">
+      <div>
+        <h2>Page Grid <span class="badge-pill">{{ document.total_pages }}</span></h2>
+        <p>Click any page to toggle. High-resolution vector thumbnails load automatically as you navigate.</p>
+      </div>
+    </div>
+    <div class="page-pagination">
+      <button id="prevBatch" class="pagination-button" type="button" aria-label="Previous batch of pages">
+        <svg viewBox="0 0 24 24" width="16" height="16"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <span>Previous</span>
+      </button>
+      <span id="pageRangeLabel" class="pagination-label">Pages 1–{{ [document.total_pages, 48]|min }} of {{ document.total_pages }}</span>
+      <button id="nextBatch" class="pagination-button" type="button" aria-label="Next batch of pages">
+        <span>Next</span>
+        <svg viewBox="0 0 24 24" width="16" height="16"><path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="page-grid" id="pageGrid" aria-live="polite"></div>
+  <div class="empty-pages hidden" id="thumbnailError" role="status">Some page previews could not be generated. You can still select and extract them by page number.</div>
+</section>
+
+<!-- Sticky Frosted-Glass Editor Action Footer -->
+<footer class="editor-footer">
+  <div class="footer-info">
+    <strong id="footerSelection">No pages selected</strong>
+    <small id="footerNote">Original file remains untouched in your private library.</small>
+  </div>
+  <div class="footer-actions">
+    <button id="createPdf" class="button button-primary button-lg" type="button" disabled>
+      <span>Create PDF for selected pages</span>
+      <svg viewBox="0 0 24 24" width="18" height="18"><path d="M5 12h14m-7-7 7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+</footer>
+
+<!-- Result Download Modal with Frosted Glass -->
+<div class="modal-backdrop hidden" id="resultModal" role="dialog" aria-modal="true" aria-labelledby="resultTitle">
+  <section class="result-card">
+    <button class="modal-close icon-button" id="closeResult" aria-label="Close dialog">&times;</button>
+    <div class="success-mark-ring">
+      <svg viewBox="0 0 24 24" width="32" height="32"><path d="M5 13l4 4L19 7" stroke="#0EA5E9" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+    </div>
+    <span class="eyebrow">READY TO DOWNLOAD</span>
+    <h2 id="resultTitle">Your new PDF is ready</h2>
+    <p class="result-subtitle" id="resultDetails"></p>
+    <div class="result-meta" id="resultMeta"></div>
+    <div class="result-actions">
+      <a class="button button-primary button-wide button-lg" id="downloadResult" href="#">
+        <svg viewBox="0 0 24 24" width="18" height="18"><path d="M12 3v12m0 0 4-4m-4 4-4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg>
+        <span>Download Generated PDF</span>
+      </a>
+      <button class="button button-secondary button-wide" id="createAnother" type="button">Create Another Version</button>
+    </div>
+  </section>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/workspace.js') }}" defer></script>
+{% endblock %}

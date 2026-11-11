@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" width="100%" height="100%" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="prism-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="45%" stop-color="#F4FAFF" />
+      <stop offset="100%" stop-color="#EAF5FD" />
+    </linearGradient>
+    <linearGradient id="facet-1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.75" />
+      <stop offset="100%" stop-color="#7DD3FC" stop-opacity="0.15" />
+    </linearGradient>
+    <linearGradient id="facet-2" x1="100%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#38BDF8" stop-opacity="0.25" />
+      <stop offset="100%" stop-color="#0EA5E9" stop-opacity="0.08" />
+    </linearGradient>
+    <linearGradient id="edge-light" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.9" />
+      <stop offset="100%" stop-color="#38BDF8" stop-opacity="0.3" />
+    </linearGradient>
+    <filter id="prism-glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="80" />
+    </filter>
+  </defs>
+
+  <rect width="1600" height="900" fill="url(#prism-bg)" />
+
+  <circle cx="350" cy="250" r="300" fill="#7DD3FC" fill-opacity="0.25" filter="url(#prism-glow)" />
+  <circle cx="1250" cy="650" r="340" fill="#38BDF8" fill-opacity="0.20" filter="url(#prism-glow)" />
+
+  <!-- Glass Crystal Facet Structures -->
+  <g transform="translate(140, 100)" opacity="0.85">
+    <polygon points="120,40 280,110 210,290 50,220" fill="url(#facet-1)" stroke="url(#edge-light)" stroke-width="1.5" />
+    <polygon points="280,110 390,200 320,380 210,290" fill="url(#facet-2)" stroke="url(#edge-light)" stroke-width="1.5" />
+    <polygon points="50,220 210,290 140,430 0,360" fill="url(#facet-1)" stroke="rgba(56, 189, 248, 0.25)" stroke-width="1" />
+  </g>
+
+  <g transform="translate(1080, 260)" opacity="0.80">
+    <polygon points="180,60 360,140 270,360 90,280" fill="url(#facet-2)" stroke="url(#edge-light)" stroke-width="1.5" />
+    <polygon points="360,140 450,260 360,450 270,360" fill="url(#facet-1)" stroke="url(#edge-light)" stroke-width="1.5" />
+  </g>
+</svg>

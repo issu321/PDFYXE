@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" width="100%" height="100%" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="av1-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0B192C" />
+      <stop offset="35%" stop-color="#1E3E62" />
+      <stop offset="70%" stop-color="#1E40AF" />
+      <stop offset="100%" stop-color="#0284C7" />
+    </linearGradient>
+    <linearGradient id="av1-glass1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.35" />
+      <stop offset="50%" stop-color="#38BDF8" stop-opacity="0.15" />
+      <stop offset="100%" stop-color="#1D4ED8" stop-opacity="0.25" />
+    </linearGradient>
+    <linearGradient id="av1-glass2" x1="100%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#60A5FA" stop-opacity="0.4" />
+      <stop offset="100%" stop-color="#0F172A" stop-opacity="0.6" />
+    </linearGradient>
+    <linearGradient id="av1-glow" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#38BDF8" />
+      <stop offset="100%" stop-color="#818CF8" />
+    </linearGradient>
+    <filter id="av1-blur-deep" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="90" />
+    </filter>
+    <filter id="av1-blur-glass" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="16" />
+    </filter>
+  </defs>
+
+  <rect width="1200" height="900" fill="url(#av1-bg)" />
+
+  <!-- Luminous atmospheric spheres -->
+  <circle cx="300" cy="240" r="280" fill="#2563EB" fill-opacity="0.45" filter="url(#av1-blur-deep)" />
+  <circle cx="950" cy="380" r="320" fill="#38BDF8" fill-opacity="0.35" filter="url(#av1-blur-deep)" />
+  <circle cx="600" cy="720" r="300" fill="#1D4ED8" fill-opacity="0.5" filter="url(#av1-blur-deep)" />
+
+  <!-- Flowing 3D Glass Geometric Structures -->
+  <g transform="translate(180, 120)">
+    <!-- Back glass slab -->
+    <rect x="80" y="80" width="440" height="300" rx="36" fill="url(#av1-glass2)" stroke="rgba(255, 255, 255, 0.25)" stroke-width="2" transform="rotate(-12 300 230)" />
+    <!-- Front frosted glass prism -->
+    <rect x="140" y="140" width="460" height="310" rx="40" fill="url(#av1-glass1)" stroke="rgba(255, 255, 255, 0.45)" stroke-width="2.5" transform="rotate(6 370 295)" />
+    
+    <!-- Light reflection highlights -->
+    <path d="M170 190 L560 230" stroke="#FFFFFF" stroke-opacity="0.6" stroke-width="3" stroke-linecap="round" />
+    <circle cx="480" cy="280" r="60" fill="url(#av1-glow)" fill-opacity="0.35" filter="url(#av1-blur-glass)" />
+    <circle cx="280" cy="360" r="45" fill="#38BDF8" fill-opacity="0.4" />
+  </g>
+
+  <!-- Futuristic Floating Glass Discs -->
+  <circle cx="960" cy="220" r="85" fill="none" stroke="rgba(255, 255, 255, 0.35)" stroke-width="2" />
+  <circle cx="960" cy="220" r="55" fill="rgba(56, 189, 248, 0.2)" stroke="rgba(96, 165, 250, 0.5)" stroke-width="2" />
+  <circle cx="180" cy="740" r="120" fill="none" stroke="rgba(56, 189, 248, 0.25)" stroke-width="1.5" stroke-dasharray="16 8" />
+</svg>

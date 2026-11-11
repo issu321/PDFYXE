@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}Processing History{% endblock %}
+{% block breadcrumb %}Processing History{% endblock %}
+
+{% block content %}
+<section class="welcome-hero">
+  <div class="welcome-text">
+    <span class="eyebrow">AUDIT TRAILS</span>
+    <h1 class="welcome-title">Processing History</h1>
+    <p class="welcome-desc">A transparent log of all document operations, uploads, page extractions, and merges executed in your workspace.</p>
+  </div>
+</section>
+
+<!-- Filter Toolbar -->
+<div class="table-toolbar">
+  <div class="search-input-wrapper">
+    <svg class="search-icon" viewBox="0 0 24 24" width="18" height="18"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2" fill="none"/><path d="m20 20-3-3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    <input type="search" id="historyTableSearch" class="table-search-input" placeholder="Search history by operation, document, or date…" aria-label="Search processing history">
+  </div>
+  <div class="table-stats-badge">
+    <span id="filteredHistCount">{{ history|length }}</span> events recorded
+  </div>
+</div>
+
+<section class="list-panel">
+{% if history %}
+  <div class="table-head history-head">
+    <span>OPERATION TYPE</span>
+    <span>TARGET DOCUMENT</span>
+    <span>EXECUTION STATUS</span>
+    <span>PROCESSING DURATION</span>
+    <span class="align-right">TIMESTAMP</span>
+  </div>
+  <div class="table-body" id="historyTableBody">
+    {% for event in history %}
+      <div class="table-row history-row" data-search-term="{{ event.operation_type|lower }} {{ (event.document.original_filename if event.document else '')|lower }} {{ event.processing_status|lower }} {{ event.created_at.strftime('%b %d %Y')|lower }}">
+        <span class="history-operation">
+          <span class="history-icon {{ 'icon-upload' if event.operation_type == 'upload' else 'icon-merge' if event.operation_type == 'merge' else 'icon-remove' if event.operation_type == 'remove' else 'icon-extract' }}">
+            {% if event.operation_type == 'upload' %}
+              <svg viewBox="0 0 24 24" width="16" height="16"><path d="M12 19V5m-7 7 7-7 7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            {% elif event.operation_type == 'merge' %}
+              <svg viewBox="0 0 24 24" width="16" height="16"><path d="M12 4v16m-8-8h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            {% elif event.operation_type == 'remove' %}
+              <svg viewBox="0 0 24 24" width="16" height="16"><path d="M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            {% else %}
+              <svg viewBox="0 0 24 24" width="16" height="16"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6Z" fill="currentColor"/></svg>
+            {% endif %}
+          </span>
+          <strong>
+            {% if event.operation_type == 'upload' %}PDF Uploaded
+            {% elif event.operation_type == 'merge' %}PDFs Merged
+            {% elif event.operation_type == 'remove' %}Pages Removed
+            {% else %}Pages Extracted{% endif %}
+          </strong>
+        </span>
+
+        <span class="history-target-doc" title="{{ event.document.original_filename if event.document else 'Deleted document' }}">
+          {{ event.document.original_filename if event.document else 'Archived / Deleted document' }}
+        </span>
+
+        <span>
+          <span class="status-pill {{ 'status-ready' if event.processing_status == 'complete' else 'status-failed' }}">
+            {{ event.processing_status|capitalize }}
+          </span>
+        </span>
+
+        <span class="history-duration">
+          <span class="duration-badge">{{ '%.2f s'|format(event.processing_duration) }}</span>
+        </span>
+
+        <span class="history-timestamp align-right">{{ event.created_at.strftime('%b %d, %Y · %H:%M') }}</span>
+      </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="empty-state">
+    <img src="{{ url_for('static', filename='img/illustrations/empty-history.svg') }}" alt="" class="empty-vector" width="180" height="140" />
+    <h3>No operations recorded yet</h3>
+    <p>As you upload, extract, remove, and merge PDF documents, every activity is captured here for your reference.</p>
+  </div>
+{% endif %}
+</section>
+{% endblock %}

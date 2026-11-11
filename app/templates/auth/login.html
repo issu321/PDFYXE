@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% block title %}Sign In — PDFCraft Studio{% endblock %}
+
+{% block auth_content %}
+<div class="auth-split-wrapper">
+  <!-- Left Side: Showcase Visual Hero with Random Background Image & Glass Badges -->
+  <aside class="auth-visual-hero" id="authVisualHero">
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <div class="hero-brand-badge">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none"><path d="M7 3.75h7l4.25 4.3v12.2H7a2 2 0 0 1-2-2v-12.5a2 2 0 0 1 2-2Z" stroke="#FFFFFF" stroke-width="2"/><path d="M14 4v4.5h4.2M8.5 13h7M8.5 16.5h7" stroke="#38BDF8" stroke-width="2"/></svg>
+        <span>ENTERPRISE DOCUMENT PLATFORM</span>
+      </div>
+
+      <h2 class="hero-heading">High-Fidelity Document Manipulation.</h2>
+      <p class="hero-subtext">Extract, reorder, merge, and clean PDF documents with pure in-memory precision. Zero server retention, zero data leakage.</p>
+
+      <!-- Glass Feature Matrix Cards -->
+      <div class="hero-feature-grid">
+        <div class="hero-feature-pill">
+          <div class="pill-icon">
+            <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          </div>
+          <div class="pill-text">
+            <strong>AES-256 Vault</strong>
+            <small>Client-isolated security</small>
+          </div>
+        </div>
+
+        <div class="hero-feature-pill">
+          <div class="pill-icon">
+            <svg viewBox="0 0 24 24"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="pill-text">
+            <strong>Vector Preservation</strong>
+            <small>Lossless typography &amp; layout</small>
+          </div>
+        </div>
+      </div>
+
+      <!-- Trust Badge -->
+      <div class="hero-trust-box">
+        <div class="trust-stars">★★★★★</div>
+        <span>Trusted by finance, engineering, and legal teams worldwide</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Right Side: Elevated Glass Sign-In Form -->
+  <section class="auth-card" id="authCard">
+    <div class="auth-header">
+      <div class="auth-pill-badge">
+        <span class="badge-dot"></span>
+        <span>SECURE LOGIN</span>
+      </div>
+      <h1 class="auth-title">Welcome Back<span class="accent-dot">.</span></h1>
+      <p class="auth-subtitle">Sign in to your private workspace to continue managing your PDF library.</p>
+    </div>
+
+    <form method="post" class="form-stack">
+      {{ form.hidden_tag() }}
+
+      <div class="field">
+        <label for="{{ form.email.id }}" class="field-label">Email address</label>
+        <div class="input-wrapper">
+          <svg class="input-icon" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" fill="none" stroke="currentColor" stroke-width="2"/><polyline points="22,6 12,13 2,6" stroke="currentColor" stroke-width="2" fill="none"/></svg>
+          {{ form.email(class="text-input with-icon", placeholder="name@company.com", autocomplete="email") }}
+        </div>
+        {% for error in form.email.errors %}
+          <small class="field-error">{{ error }}</small>
+        {% endfor %}
+      </div>
+
+      <div class="field">
+        <div class="field-label-row">
+          <label for="{{ form.password.id }}" class="field-label">Password</label>
+          <a href="{{ url_for('auth.register') }}" class="inline-link">Need an account?</a>
+        </div>
+        <div class="input-wrapper">
+          <svg class="input-icon" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+          {{ form.password(class="text-input with-icon", placeholder="Enter your password", autocomplete="current-password") }}
+        </div>
+        {% for error in form.password.errors %}
+          <small class="field-error">{{ error }}</small>
+        {% endfor %}
+      </div>
+
+      <div class="field-aux-row">
+        <label class="check-line">
+          {{ form.remember(class="custom-checkbox") }}
+          <span>Keep me signed in on this device</span>
+        </label>
+      </div>
+
+      <button class="button button-primary button-wide button-lg" type="submit">
+        <span>Sign In to Studio</span>
+        <svg viewBox="0 0 24 24" width="18" height="18"><path d="M5 12h14m-7-7 7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+    </form>
+
+    <div class="auth-card-footer">
+      <div class="auth-security-note">
+        <svg viewBox="0 0 24 24" width="16" height="16" class="security-lock-icon"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+        <span>End-to-End Local Execution · Zero Telemetry Tracking</span>
+      </div>
+    </div>
+  </section>
+</div>
+{% endblock %}

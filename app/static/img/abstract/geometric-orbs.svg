@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" width="100%" height="100%" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="geom-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F8FCFF" />
+      <stop offset="60%" stop-color="#EEF7FE" />
+      <stop offset="100%" stop-color="#E2F2FD" />
+    </linearGradient>
+    <linearGradient id="orb-grad-1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#7DD3FC" stop-opacity="0.35" />
+      <stop offset="100%" stop-color="#0EA5E9" stop-opacity="0.10" />
+    </linearGradient>
+    <linearGradient id="orb-grad-2" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#38BDF8" stop-opacity="0.30" />
+      <stop offset="100%" stop-color="#BAE6FD" stop-opacity="0.08" />
+    </linearGradient>
+    <linearGradient id="glass-rim" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.8" />
+      <stop offset="50%" stop-color="#38BDF8" stop-opacity="0.3" />
+      <stop offset="100%" stop-color="#0EA5E9" stop-opacity="0.2" />
+    </linearGradient>
+    <filter id="f-deep-blur" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="110" />
+    </filter>
+    <filter id="f-medium-blur" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="45" />
+    </filter>
+  </defs>
+
+  <rect width="1600" height="900" fill="url(#geom-bg)" />
+
+  <!-- Atmospheric diffused spheres -->
+  <circle cx="240" cy="220" r="380" fill="#38BDF8" fill-opacity="0.18" filter="url(#f-deep-blur)" />
+  <circle cx="1400" cy="260" r="420" fill="#0EA5E9" fill-opacity="0.15" filter="url(#f-deep-blur)" />
+  <circle cx="820" cy="680" r="350" fill="#7DD3FC" fill-opacity="0.22" filter="url(#f-deep-blur)" />
+
+  <!-- 3D Glass Rings & Discs -->
+  <g transform="translate(180, 140)">
+    <circle cx="120" cy="120" r="140" fill="url(#orb-grad-1)" filter="url(#f-medium-blur)" />
+    <circle cx="120" cy="120" r="130" fill="none" stroke="url(#glass-rim)" stroke-width="2.5" opacity="0.6" />
+    <circle cx="120" cy="120" r="100" fill="none" stroke="rgba(255, 255, 255, 0.7)" stroke-width="1.5" stroke-dasharray="16 8" opacity="0.4" />
+  </g>
+
+  <g transform="translate(1180, 180)">
+    <ellipse cx="160" cy="140" rx="190" ry="130" fill="url(#orb-grad-2)" transform="rotate(-18 160 140)" />
+    <ellipse cx="160" cy="140" rx="175" ry="115" fill="none" stroke="url(#glass-rim)" stroke-width="2" transform="rotate(-18 160 140)" opacity="0.7" />
+    <circle cx="260" cy="80" r="40" fill="#FFFFFF" fill-opacity="0.4" stroke="rgba(56, 189, 248, 0.4)" stroke-width="1.5" />
+  </g>
+
+  <g transform="translate(740, 520)">
+    <circle cx="100" cy="100" r="110" fill="rgba(255, 255, 255, 0.25)" stroke="url(#glass-rim)" stroke-width="1.5" />
+    <circle cx="100" cy="100" r="85" fill="none" stroke="rgba(56, 189, 248, 0.3)" stroke-width="1" stroke-dasharray="12 6" />
+  </g>
+</svg>

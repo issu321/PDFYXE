@@ -1,0 +1,377 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block breadcrumb %}Dashboard{% endblock %}
+
+{% block content %}
+<!-- Dashboard Welcome & Action Bar with Darker Royal Blue Gradients -->
+<section class="welcome-hero">
+  <div class="welcome-text">
+    <div class="welcome-badge">
+      <span class="badge-dot"></span>
+      <span>Enterprise Workspace</span>
+    </div>
+    <h1 class="welcome-title">Good to see you, {{ current_user.username }}<span class="accent-dot">.</span></h1>
+    <p class="welcome-desc">A precision glass studio to organize, extract, merge, and transform your PDF documents with total confidentiality.</p>
+  </div>
+  <div class="welcome-actions">
+    <a class="button button-secondary button-lg" href="{{ url_for('pdf.merge_workspace') }}">
+      <svg class="button-icon" viewBox="0 0 24 24"><path d="M12 4v16m-8-8h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <span>Merge PDFs</span>
+    </a>
+    <a class="button button-primary button-lg" href="#upload">
+      <svg class="button-icon" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6Zm-1 2 5 5h-5V4ZM8 13h8v2H8v-2Zm0 4h5v2H8v-2Z" fill="currentColor"/></svg>
+      <span>Extract Pages</span>
+    </a>
+  </div>
+</section>
+
+<!-- Stats Grid with Rich Cobalt/Royal Blue Accents -->
+<section class="stats-grid" aria-label="Workspace metrics">
+  <article class="stat-card">
+    <div class="stat-card-header">
+      <span class="stat-icon-wrapper blue">
+        <svg viewBox="0 0 24 24"><path d="M4 4h16v16H4V4Zm2 2v12h12V6H6Zm2 2h8v2H8V8Zm0 4h8v2H8v-2Z" fill="currentColor"/></svg>
+      </span>
+      <span class="stat-trend trend-positive">Library</span>
+    </div>
+    <div class="stat-card-body">
+      <strong class="stat-value">{{ document_count }}</strong>
+      <span class="stat-label">Source PDF Documents</span>
+    </div>
+    <div class="stat-card-footer">
+      <span>{{ storage_bytes|filesizeformat }} total storage</span>
+    </div>
+  </article>
+
+  <article class="stat-card">
+    <div class="stat-card-header">
+      <span class="stat-icon-wrapper sky">
+        <svg viewBox="0 0 24 24"><path d="M12 3v12m0 0 4-4m-4 4-4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </span>
+      <span class="stat-trend trend-positive">Ready</span>
+    </div>
+    <div class="stat-card-body">
+      <strong class="stat-value">{{ generated_count }}</strong>
+      <span class="stat-label">Generated PDFs</span>
+    </div>
+    <div class="stat-card-footer">
+      <span>Exported &amp; ready to download</span>
+    </div>
+  </article>
+
+  <article class="stat-card">
+    <div class="stat-card-header">
+      <span class="stat-icon-wrapper green">
+        <svg viewBox="0 0 24 24"><path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2Zm-7 14H7v-2h5v2Zm5-4H7v-2h10v2Zm0-4H7V7h10v2Z" fill="currentColor"/></svg>
+      </span>
+      <span class="stat-trend trend-neutral">Throughput</span>
+    </div>
+    <div class="stat-card-body">
+      <strong class="stat-value">{{ pages_processed }}</strong>
+      <span class="stat-label">Pages Processed</span>
+    </div>
+    <div class="stat-card-footer">
+      <span>In-memory vector extraction</span>
+    </div>
+  </article>
+
+  <article class="stat-card">
+    <div class="stat-card-header">
+      <span class="stat-icon-wrapper violet">
+        <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </span>
+      <span class="stat-trend trend-positive">{{ success_rate }}% Success</span>
+    </div>
+    <div class="stat-card-body">
+      <strong class="stat-value">{{ success_rate }}%</strong>
+      <span class="stat-label">Processing Integrity</span>
+    </div>
+    <div class="stat-card-footer">
+      <span>Zero data loss verification</span>
+    </div>
+  </article>
+</section>
+
+<!-- Interactive Data Visualizations & Analytics -->
+<section class="analytics-card" aria-label="Processing Analytics">
+  <div class="analytics-header">
+    <div class="analytics-title-group">
+      <span class="eyebrow">ACTIVITY TELEMETRY</span>
+      <h2>Processing Volume &amp; Operations</h2>
+      <p>Daily volume throughput over the past 7 days across extractions and merges.</p>
+    </div>
+    <div class="analytics-legend">
+      <div class="legend-item"><span class="legend-dot dot-sky"></span><span>Pages Processed</span></div>
+      <div class="legend-item"><span class="legend-dot dot-blue"></span><span>Operations</span></div>
+    </div>
+  </div>
+
+  <div class="analytics-body">
+    <!-- Clean Responsive Vector Chart with Strict Overflow Clipping -->
+    <div class="chart-container" id="analyticsChartWrapper" style="overflow: hidden; position: relative;">
+      <svg class="analytics-svg" viewBox="0 0 840 230" preserveAspectRatio="none" style="overflow: hidden; width: 100%; height: 100%;">
+        <defs>
+          <linearGradient id="chartSkyGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#2563EB" stop-opacity="0.6" />
+            <stop offset="60%" stop-color="#0284C7" stop-opacity="0.3" />
+            <stop offset="100%" stop-color="#38BDF8" stop-opacity="0.05" />
+          </linearGradient>
+        </defs>
+
+        <!-- Horizontal Guide Lines -->
+        <line x1="30" y1="40" x2="810" y2="40" stroke="rgba(37, 99, 235, 0.12)" stroke-dasharray="4 4" />
+        <line x1="30" y1="90" x2="810" y2="90" stroke="rgba(37, 99, 235, 0.12)" stroke-dasharray="4 4" />
+        <line x1="30" y1="140" x2="810" y2="140" stroke="rgba(37, 99, 235, 0.12)" stroke-dasharray="4 4" />
+        <line x1="30" y1="180" x2="810" y2="180" stroke="rgba(37, 99, 235, 0.25)" stroke-width="1.5" />
+
+        <!-- Interactive Bar Columns from Server-Precalculated Coordinates -->
+        {% for day in daily_stats %}
+          {% set x_pos = 65 + loop.index0 * 118 %}
+          <g class="chart-bar-group" tabindex="0">
+            <!-- Background column hover zone -->
+            <rect x="{{ x_pos - 25 }}" y="20" width="50" height="160" rx="8" fill="rgba(37, 99, 235, 0.04)" class="col-hover" />
+            <!-- Bar column (Guaranteed bounded inside 20-180) -->
+            <rect x="{{ x_pos - 13 }}" y="{{ day.bar_y }}" width="26" height="{{ day.bar_h }}" rx="6" fill="url(#chartSkyGrad)" stroke="#2563EB" stroke-width="1.5" class="chart-bar" />
+            <!-- Operations Dot Marker -->
+            <circle cx="{{ x_pos }}" cy="{{ day.op_y }}" r="4" fill="#0284C7" stroke="#FFFFFF" stroke-width="2" />
+            <!-- Day Label -->
+            <text x="{{ x_pos }}" y="204" text-anchor="middle" class="chart-axis-label">{{ day.label }}</text>
+            <text x="{{ x_pos }}" y="220" text-anchor="middle" class="chart-sub-label">{{ day.pages }}p</text>
+          </g>
+        {% endfor %}
+      </svg>
+    </div>
+
+    <!-- Operations Distribution Quick Summary -->
+    <div class="analytics-sidebar">
+      <h3 class="analytics-side-title">Operation Breakdown</h3>
+      <div class="breakdown-list">
+        <div class="breakdown-item">
+          <div class="breakdown-label">
+            <span class="breakdown-dot blue"></span>
+            <span>Page Extractions</span>
+          </div>
+          <strong>{{ extract_count }}</strong>
+        </div>
+        <div class="breakdown-item">
+          <div class="breakdown-label">
+            <span class="breakdown-dot sky"></span>
+            <span>PDF Merges</span>
+          </div>
+          <strong>{{ merge_count }}</strong>
+        </div>
+        <div class="breakdown-item">
+          <div class="breakdown-label">
+            <span class="breakdown-dot violet"></span>
+            <span>Page Removals</span>
+          </div>
+          <strong>{{ remove_count }}</strong>
+        </div>
+        <div class="breakdown-item">
+          <div class="breakdown-label">
+            <span class="breakdown-dot green"></span>
+            <span>Document Uploads</span>
+          </div>
+          <strong>{{ upload_count }}</strong>
+        </div>
+      </div>
+      <div class="breakdown-footer">
+        <a class="button button-ghost button-sm" href="{{ url_for('documents.history') }}">
+          <span>Detailed logs</span>
+          <svg viewBox="0 0 24 24" width="16" height="16"><path d="M5 12h14m-7-7 7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Dashboard Main Columns Grid -->
+<section class="dashboard-grid">
+  <!-- Primary Column: Upload & Recent Documents -->
+  <div class="primary-column">
+    <div class="section-heading">
+      <div>
+        <h2>Upload &amp; Transform</h2>
+        <p>Drop any PDF file to inspect its structure and extract or remove pages.</p>
+      </div>
+    </div>
+
+    <!-- High-Visibility Glass Upload Panel -->
+    <section class="upload-panel" id="upload">
+      <input type="file" id="pdfFile" accept=".pdf,application/pdf" hidden>
+      <div class="upload-content" id="dropZone" tabindex="0" role="button" aria-label="Drop or select a PDF to upload">
+        <div class="upload-symbol">
+          <svg viewBox="0 0 48 48" aria-hidden="true">
+            <path d="M14 7h14l9 9v22H14a4 4 0 0 1-4-4V11a4 4 0 0 1 4-4Z" fill="none" stroke="currentColor" stroke-width="2"/>
+            <path d="M28 8v9h8M24 33V21m-6 6 6-6 6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <h3>Drop your PDF file here</h3>
+        <p>Drag and drop directly into the workspace, or <button type="button" id="browseFile" class="text-action">browse from disk</button></p>
+        <div class="upload-badges">
+          <span class="spec-pill">Portable Document Format (.pdf)</span>
+          <span class="spec-pill">Encrypted-Safe Verification</span>
+          <span class="spec-pill">Client-Level Isolation</span>
+        </div>
+      </div>
+
+      <!-- Intelligent Multi-Stage Upload Progress -->
+      <div class="upload-progress hidden" id="uploadProgress" aria-live="polite">
+        <div class="progress-file">
+          <span class="pdf-mini">
+            <svg viewBox="0 0 24 24" width="22" height="22"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6Z" fill="#1D4ED8"/></svg>
+          </span>
+          <div class="progress-details">
+            <strong id="uploadName">Uploading PDF</strong>
+            <small id="uploadStatus">Streaming securely into workspace…</small>
+          </div>
+          <span id="uploadPercent" class="progress-percent">0%</span>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill" id="progressBar"></div>
+        </div>
+        <div class="progress-steps">
+          <span class="step-item step-active">1. Upload</span>
+          <span class="step-item">2. Inspect signature</span>
+          <span class="step-item">3. Render previews</span>
+        </div>
+      </div>
+
+      <div class="upload-error hidden" id="uploadError" role="alert"></div>
+    </section>
+
+    <!-- Recent Documents Table / List -->
+    <section class="list-section">
+      <div class="section-heading">
+        <div>
+          <h2>Source Documents</h2>
+          <p>Your private document library, ready for editing anytime.</p>
+        </div>
+        <a class="subtle-link" href="{{ url_for('documents.index') }}">
+          <span>All documents ({{ document_count }})</span>
+          <svg viewBox="0 0 24 24" width="16" height="16"><path d="M5 12h14m-7-7 7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </a>
+      </div>
+
+      {% if recent_documents %}
+        <div class="document-list">
+          {% for doc in recent_documents %}
+            <div class="document-row-card">
+              <a class="doc-main-link" href="{{ url_for('pdf.workspace', document_id=doc.id) }}">
+                <div class="file-icon-box">
+                  <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6Zm-1 2 5 5h-5V4Z" fill="currentColor"/></svg>
+                  <span class="icon-label">PDF</span>
+                </div>
+                <div class="document-meta">
+                  <strong class="doc-title" title="{{ doc.original_filename }}">{{ doc.original_filename }}</strong>
+                  <div class="doc-submeta">
+                    <span class="meta-tag">{{ doc.total_pages }} {% if doc.total_pages == 1 %}page{% else %}pages{% endif %}</span>
+                    <span class="meta-sep">·</span>
+                    <span>{{ doc.file_size|filesizeformat }}</span>
+                    <span class="meta-sep">·</span>
+                    <span>{{ doc.created_at.strftime('%b %d, %Y') }}</span>
+                  </div>
+                </div>
+              </a>
+              <div class="doc-actions">
+                <span class="status-pill status-ready">Ready</span>
+                <a class="button button-ghost button-sm" href="{{ url_for('pdf.workspace', document_id=doc.id) }}">
+                  <span>Open editor</span>
+                  <svg viewBox="0 0 24 24" width="14" height="14"><path d="M5 12h14m-7-7 7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                </a>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="empty-state">
+          <img src="{{ url_for('static', filename='img/illustrations/empty-documents.svg') }}" alt="" class="empty-vector" width="160" height="120" />
+          <h3>Your document library is empty</h3>
+          <p>Upload your first PDF document to inspect individual pages, rearrange page orders, and extract custom files.</p>
+          <button type="button" class="button button-primary" onclick="document.getElementById('pdfFile').click()">
+            Upload PDF Now
+          </button>
+        </div>
+      {% endif %}
+    </section>
+  </div>
+
+  <!-- Secondary Column: Recent Creations & Quick Info -->
+  <aside class="secondary-column">
+    <!-- Recent Creations -->
+    <section class="side-card">
+      <div class="side-card-header">
+        <div>
+          <h3>Recent Creations</h3>
+          <p>Exported documents ready to download.</p>
+        </div>
+        <a class="tiny-link" href="{{ url_for('documents.generated') }}">View all</a>
+      </div>
+      {% if recent_generated %}
+        <div class="mini-list">
+          {% for item in recent_generated %}
+            <div class="mini-row-card">
+              <div class="mini-file-icon">
+                <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6Z" fill="currentColor"/></svg>
+              </div>
+              <div class="mini-meta">
+                <strong title="{{ 'Merged Document' if item.operation_type == 'merge' else item.source_document.original_filename }}">
+                  {{ 'Merged PDF' if item.operation_type == 'merge' else item.source_document.original_filename|truncate(26) }}
+                </strong>
+                <small>{{ item.total_selected_pages }} pages · {{ item.created_at.strftime('%b %d') }}</small>
+              </div>
+              <a class="download-action-btn" href="{{ url_for('documents.download_generated', generated_id=item.id) }}" title="Download {{ item.generated_filename }}">
+                <svg viewBox="0 0 24 24"><path d="M12 3v12m0 0 4-4m-4 4-4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg>
+              </a>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="empty-state mini-empty">
+          <img src="{{ url_for('static', filename='img/illustrations/empty-generated.svg') }}" alt="" class="empty-vector-sm" width="100" height="80" />
+          <p>Created PDFs will automatically appear here for one-click downloading.</p>
+        </div>
+      {% endif %}
+    </section>
+
+    <!-- Studio Pro-Tip Card with Rich Linear Gradient Shimmer -->
+    <section class="tip-card">
+      <div class="tip-header">
+        <span class="tip-badge">✦</span>
+        <span class="tip-caption">STUDIO TIP</span>
+      </div>
+      <h3>Non-Destructive Workflow</h3>
+      <p>Original source files are never altered or deleted during extraction or merging. Each export produces a pristine, standalone PDF copy preserving full vector fidelity.</p>
+    </section>
+
+    <!-- Recent Activity Timeline -->
+    {% if recent_history %}
+      <section class="activity-card">
+        <div class="side-card-header">
+          <div>
+            <h3>Recent Activity</h3>
+            <p>Operation audit log</p>
+          </div>
+          <a class="tiny-link" href="{{ url_for('documents.history') }}">Full log</a>
+        </div>
+        <div class="activity-stream">
+          {% for event in recent_history %}
+            <div class="activity-stream-item">
+              <span class="activity-pulse {{ 'pulse-success' if event.processing_status == 'complete' else 'pulse-error' }}"></span>
+              <div class="activity-info">
+                <strong>
+                  {% if event.operation_type == 'upload' %}Document Uploaded
+                  {% elif event.operation_type == 'merge' %}PDFs Merged
+                  {% elif event.operation_type == 'remove' %}Pages Removed
+                  {% else %}Pages Extracted{% endif %}
+                </strong>
+                <small>{{ event.created_at.strftime('%b %d · %H:%M') }} · {{ '%.2f s'|format(event.processing_duration) }}</small>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      </section>
+    {% endif %}
+  </aside>
+</section>
+{% endblock %}
